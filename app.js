@@ -32,8 +32,9 @@ const EXAMPLE = {
 };
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
+const LOGO_SRC = (typeof ASSET_DATA !== 'undefined' && ASSET_DATA.logo) || 'assets/logo.png';
 let state = load() || clone(EXAMPLE);
-const images = { logo: null, background: null };
+const images = { logo: null, background: null, elements: {} };
 
 function load() {
   try {
@@ -93,10 +94,50 @@ function renderThemes() {
         state.title = t.title;
         $('title').value = t.title;
       }
+      state.cornerPics = null;
+      state.footPics = null;
       renderThemes();
+      renderPics();
       scheduleDraw();
     });
     box.appendChild(b);
+  }
+}
+
+/* ---------- Brand pictures ---------- */
+function currentPics(kind) {
+  const theme = THEMES[state.theme];
+  return state[kind] || theme[kind] || [];
+}
+
+function renderPics() {
+  $('picBox').hidden = state.decorations === false;
+  for (const kind of ['cornerPics', 'footPics']) {
+    const box = $(kind);
+    box.innerHTML = '';
+    const chosen = currentPics(kind);
+    for (const el of ELEMENTS) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pic';
+      const pos = chosen.indexOf(el.id);
+      b.setAttribute('aria-pressed', String(pos >= 0));
+      b.title = el.label;
+      b.setAttribute('aria-label', el.label);
+      b.innerHTML = `<img alt="" src="${el.src}" loading="lazy"><span class="n">${pos >= 0 && kind === 'footPics' ? pos + 1 : ''}</span>`;
+      b.addEventListener('click', () => {
+        let list = [...currentPics(kind)];
+        if (pos >= 0) list.splice(pos, 1);
+        else {
+          list.push(el.id);
+          if (kind === 'cornerPics' && list.length > 2) list = list.slice(-2);
+        }
+        state[kind] = list;
+        renderPics();
+        scheduleDraw();
+      });
+      box.appendChild(b);
+    }
   }
 }
 
@@ -262,7 +303,13 @@ function bindTopFields() {
   br.addEventListener('change', () => { state.brackets = br.checked; scheduleDraw(); });
   const dec = $('decorations');
   dec.checked = state.decorations !== false;
-  dec.addEventListener('change', () => { state.decorations = dec.checked; scheduleDraw(); });
+  dec.addEventListener('change', () => { state.decorations = dec.checked; renderPics(); scheduleDraw(); });
+  $('themePics').addEventListener('click', () => {
+    state.cornerPics = null;
+    state.footPics = null;
+    renderPics();
+    scheduleDraw();
+  });
 
   $('addDay').addEventListener('click', () => {
     const last = state.days[state.days.length - 1];
@@ -286,7 +333,7 @@ function bindTopFields() {
     });
   }
   $('clearImages').addEventListener('click', async () => {
-    images.logo = await loadImage('logo.png');
+    images.logo = await loadImage(LOGO_SRC);
     images.background = null;
     saveImage('logo', null);
     saveImage('background', null);
@@ -360,10 +407,12 @@ $('form').addEventListener('submit', (e) => e.preventDefault());
       if (src) images[key] = await loadImage(src);
     }
   } catch { /* ignore */ }
-  // The official logo artwork, if logo.png has been added next to index.html
-  if (!images.logo) images.logo = await loadImage('logo.png');
+  // The official logo artwork and brand pictures
+  if (!images.logo) images.logo = await loadImage(LOGO_SRC);
+  await Promise.all(ELEMENTS.map(async (el) => { images.elements[el.id] = await loadImage(el.src); }));
   renderThemes();
   bindTopFields();
+  renderPics();
   renderDays();
   try { await Promise.all(['800 30px Nunito', '700 30px Nunito', '400 30px Delius', '400 30px Andika'].map((f) => document.fonts.load(f))); } catch { /* fallback font */ }
   draw();

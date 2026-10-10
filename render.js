@@ -137,6 +137,13 @@ function drawLogo(c, cx, top, w, s, logoImg) {
   return top + h + band;
 }
 
+function drawPicture(c, img, cx, cy, maxW, maxH) {
+  if (!img) return;
+  const k = Math.min(maxW / img.width, maxH / img.height);
+  const w = img.width * k, h = img.height * k;
+  c.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+}
+
 function drawCover(c, img, W, H) {
   const k = Math.max(W / img.width, H / img.height);
   const iw = img.width * k, ih = img.height * k;
@@ -167,9 +174,19 @@ function drawTimetable(canvas, state, images = {}) {
   const logoW = 300 * s;
   const logoTop = (W > H ? 16 : 40) * s;
   const logoBottom = drawLogo(c, W / 2, logoTop, logoW, s, images.logo);
-  if (state.decorations !== false) {
+  const showPics = state.decorations !== false;
+  const els = images.elements || {};
+  const cornerIds = (state.cornerPics || theme.cornerPics || []).filter((id) => els[id]);
+  const footIds = showPics ? (state.footPics || theme.footPics || []).filter((id) => els[id]) : [];
+  if (showPics) {
     const cy = logoTop + 60 * s;
-    theme.corners(c, { x: margin + 62 * s, y: cy }, { x: W - margin - 62 * s, y: cy }, s);
+    const L = { x: margin + 62 * s, y: cy }, R = { x: W - margin - 62 * s, y: cy };
+    if (cornerIds.length) {
+      drawPicture(c, els[cornerIds[0]], L.x, L.y, 130 * s, 118 * s);
+      drawPicture(c, els[cornerIds[1] || cornerIds[0]], R.x, R.y, 130 * s, 118 * s);
+    } else {
+      theme.corners(c, L, R, s);
+    }
   }
 
   // Title
@@ -338,7 +355,9 @@ function drawTimetable(canvas, state, images = {}) {
     const avail = textBottomOf(cell) - L.startY;
     const nb = L.blocks.length;
     const free = avail - L.blocks.reduce((a, b) => a + b.h, 0);
-    const gap = nb > 0 ? Math.min(free / (nb + 0.4), 110 * s) : 0;
+    // leave room at the bottom of the column when a picture goes there
+    const maxGap = footIds.length ? 34 * s : 110 * s;
+    const gap = nb > 0 ? Math.min(free / (nb + 0.4), maxGap) : 0;
     y = L.startY + gap * 0.25;
     c.fillStyle = bodyCol;
     for (const b of L.blocks) {
@@ -349,6 +368,25 @@ function drawTimetable(canvas, state, images = {}) {
         y += ln.px * (lineH - 1);
       }
       y += Math.max(gap, blockGapMin);
+    }
+
+    // Brand picture in the space left at the bottom of the column
+    if (footIds.length) {
+      const top = y - Math.max(gap, blockGapMin) + 12 * s;
+      const bottom = cell.bottom - 10 * s;
+      const room = bottom - top;
+      if (room > 56 * s) {
+        // skip pictures that would vanish into the column colour (green stars on green, etc.)
+        const clash = (id) => (green ? /^(stars-green|note-)/ : /^stars-yellow/).test(id);
+        let pick = null;
+        for (let k = 0; k < footIds.length && !pick; k++) {
+          const id = footIds[(i + k) % footIds.length];
+          if (!clash(id)) pick = id;
+        }
+        const img = pick && els[pick];
+        const size = Math.min(room * 0.86, 150 * s);
+        drawPicture(c, img, cx, top + room * 0.5, Math.min(colW * 0.66, size), size);
+      }
     }
   });
 }

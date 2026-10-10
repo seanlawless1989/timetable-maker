@@ -5,7 +5,7 @@ A one-page website where a Baby Sensory franchisee picks a theme, types in their
 ## What franchisees do
 
 1. Open the website.
-2. Pick a theme (Spring, Easter, Summer, Summer holiday, Autumn, Baby Pumpkin, Christmas, New Year or Everyday).
+2. Pick a theme (Spring, Easter, Summer, Summer holiday, Autumn, Baby Pumpkin, Christmas, New Year or Everyday), and change the brand pictures if they like.
 3. Check the title, and add a venue if they want one.
 4. Add their days, then each class's start time and age group. "Copy to next day" saves retyping.
 5. Pick a size (Facebook post, Instagram square, story, or A4 poster) and press **Download timetable**.
@@ -15,7 +15,7 @@ Their details stay saved in their own browser, so next term they only change wha
 ## Putting it online for free (GitHub Pages)
 
 1. Sign in at github.com (a free account is fine) and create a new **public** repository, for example `timetable-maker`.
-2. Choose **uploading an existing file** and drag in everything in this folder: `index.html`, `app.js`, `render.js`, `themes.js` and the `fonts` folder. The `examples` folder and this README are optional.
+2. Choose **uploading an existing file** and drag in everything in this folder: `index.html`, `app.js`, `render.js`, `themes.js`, `assets-data.js` and the `fonts` and `assets` folders. The `examples` and `tools` folders and this README are optional.
 3. Open the repository's **Settings → Pages**, set Source to **Deploy from a branch**, choose `main` and `/ (root)`, and save.
 4. After a minute the site is live at `https://<your-username>.github.io/timetable-maker/`. Share that link with franchisees.
 
@@ -34,4 +34,4 @@ Double-click `index.html`. It works offline because the fonts are included.
 - **Age groups** in the drop-down are the `AGES` list at the top of `app.js`.
 - **Sizes** are the `SIZES` list at the top of `render.js`.
 - **Fonts** follow the brand book: Delius for the day names (sub-headers), and Nunito in place of Museo Sans Rounded for the title and times. Museo Sans Rounded is a paid font; if you have a web licence for it, add the file to `fonts/` and swap it in at the top of `render.js`.
-- **Logo**: the brand book asks for the original logo artwork. Upload the primary logo from the Knowledge Library as `logo.png` next to `index.html` and every timetable uses it automatically. Until then a drawn copy of the cloud logo is used. Franchisees can also upload the logo file in the form.
+- **Logo and brand pictures** live in `assets/` (`assets/logo.png` and `assets/elements/`). Each theme picks default pictures for beside the logo (`cornerPics`) and the bottom of the columns (`footPics`) in `themes.js`, and franchisees can change them under "Pictures". To add a picture, save it as a PNG in `assets/elements/`, add it to the `ELEMENTS` list in `themes.js`, then run `python3 tools/build_assets.py`. That script packs the images into `assets-data.js`, which lets the page work even when opened straight from a folder.

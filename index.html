@@ -31,6 +31,7 @@
     :root { --bg: #12170E; --panel: #1B2215; --fg: #EDF3E4; --muted: #A9B79C; --line: #2F3A26; --green: #8FD35F; --green-strong: #A6E07B; --soft: #222B1B; --danger: #F2827A; color-scheme: dark; }
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; }
   body { background: var(--bg); color: var(--fg); font: 17px/1.45 var(--font); padding: 0 16px 48px; }
   .wrap { max-width: 1240px; margin: 0 auto; }
@@ -52,6 +53,13 @@
   .theme { display: flex; align-items: center; gap: 8px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; background: var(--bg); cursor: pointer; font: inherit; color: var(--fg); font-size: 0.95rem; text-align: left; }
   .theme[aria-pressed=true] { border-color: var(--green); background: var(--soft); font-weight: 700; }
   .sw { width: 24px; height: 24px; border-radius: 6px; flex: none; border: 1px solid rgba(0,0,0,0.12); }
+  .pics { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; margin-top: 6px; }
+  .pic { position: relative; aspect-ratio: 1; border: 2px solid var(--line); border-radius: 10px; background: var(--panel); padding: 4px; cursor: pointer; display: grid; place-items: center; }
+  .pic { min-height: 0; }
+  .pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .pic[aria-pressed=true] { border-color: var(--green); background: var(--soft); }
+  .pic .n { position: absolute; top: 2px; right: 2px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--green); color: #FFFFFF; font-size: 0.75rem; font-weight: 800; display: grid; place-items: center; padding: 0 4px; }
+  .pic .n:empty { display: none; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
   .day { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: var(--bg); }
@@ -99,7 +107,26 @@
       </fieldset>
 
       <fieldset>
-        <legend><span class="step">2</span>Name and venue</legend>
+        <legend><span class="step">2</span>Pictures</legend>
+        <label class="check"><input type="checkbox" id="decorations" checked> Show pictures</label>
+        <details id="picBox">
+          <summary>Change the pictures</summary>
+          <div style="display:grid;gap:12px">
+          <div>
+            <p class="note">Beside the logo (choose up to 2)</p>
+            <div class="pics" id="cornerPics" role="group" aria-label="Pictures beside the logo"></div>
+          </div>
+          <div>
+            <p class="note">At the bottom of the day columns (choose as many as you like)</p>
+            <div class="pics" id="footPics" role="group" aria-label="Pictures at the bottom of the columns"></div>
+          </div>
+          <div class="btns"><button type="button" class="link quiet" id="themePics">Use the theme's pictures</button></div>
+          </div>
+        </details>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span>Name and venue</legend>
         <label>Title at the top
           <input type="text" id="title" maxlength="40" placeholder="Spring Term">
         </label>
@@ -109,7 +136,7 @@
       </fieldset>
 
       <fieldset>
-        <legend><span class="step">3</span>Your classes</legend>
+        <legend><span class="step">4</span>Your classes</legend>
         <p class="note">Add up to 6 days. Finish times are optional; leave them blank to show start times only. Use "Date or place" for one-off events or locations, such as "20th October" or "Norton".</p>
         <div id="days" style="display:grid;gap:10px"></div>
         <div class="btns">
@@ -118,7 +145,7 @@
       </fieldset>
 
       <fieldset>
-        <legend><span class="step">4</span>Size and style</legend>
+        <legend><span class="step">5</span>Size and style</legend>
         <div class="row2">
           <label>Size
             <select id="size"></select>
@@ -132,14 +159,13 @@
           </label>
         </div>
         <label class="check"><input type="checkbox" id="brackets" checked> Put ages in brackets, like (0 - 13 months)</label>
-        <label class="check"><input type="checkbox" id="decorations" checked> Show the theme pictures beside the logo</label>
       </fieldset>
 
       <details>
-        <summary>Use the official logo file or a background photo</summary>
+        <summary>Use a different logo or a background photo</summary>
         <div style="display:grid;gap:10px">
           <p class="note">Optional. Use images you have the rights to, such as the official logo file or a photo from your own classes.</p>
-          <label>Official logo file (PNG with a see-through background works best)
+          <label>Logo file (the official logo is already included)
             <input type="file" id="logoFile" accept="image/*">
           </label>
           <label>Background photo
@@ -169,6 +195,7 @@
 </div>
 
 <canvas id="canvas" hidden></canvas>
+<script src="assets-data.js"></script>
 <script src="themes.js"></script>
 <script src="render.js"></script>
 <script src="app.js"></script>

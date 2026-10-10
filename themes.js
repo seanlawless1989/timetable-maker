@@ -415,12 +415,31 @@ function scatter(c, W, H, count, seed, fn) {
   for (let i = 0; i < count; i++) fn(rnd() * W, rnd() * H, rnd, i);
 }
 
+/* ---------- Brand pictures ----------
+   Official Baby Sensory elements, stored in assets/elements/<id>.png. */
+const ELEMENTS = [
+  ['flower', 'Flower'], ['sun', 'Sun'], ['moon', 'Moon'], ['rain', 'Rain cloud'], ['corn', 'Corn'],
+  ['star', 'Sleepy star'], ['stars-yellow-1', 'Yellow star'], ['stars-yellow-2', 'Yellow star 2'], ['stars-yellow-3', 'Yellow star 3'],
+  ['stars-green-1', 'Green star'], ['stars-green-2', 'Green star 2'], ['stars-green-3', 'Green star 3'],
+  ['duck', 'Duck'], ['frog', 'Frog'], ['beach-ball', 'Beach ball'], ['jingle-bell', 'Jingle bell'],
+  ['shakers-1', 'Shakers'], ['shakers-2', 'Shakers 2'], ['shaker-blue', 'Blue shaker'],
+  ['cow-puppet', 'Cow puppet'], ['giraffe-puppet', 'Giraffe puppet'],
+  ['girl', 'Girl saying hello'], ['boy', 'Boy waving'], ['friends-2', 'Friend'], ['friends-3', 'Friend 2'],
+  ['friends-6', 'Three friends'], ['friends-4', 'Four friends'],
+  ['note-2', 'Music note'], ['note-3', 'Music note 2'], ['note-4', 'Music note 3'], ['note-5', 'Music notes'], ['note-6', 'Music notes 2'],
+  ['ribbons-4', 'Ribbons'], ['ribbons-6', 'Ribbons 2'], ['ribbons-8', 'Ribbons 3'],
+].map(([id, label]) => ({ id, label, src: (typeof ASSET_DATA !== 'undefined' && ASSET_DATA.elements[id]) || `assets/elements/${id}.png` }));
+
 /* ---------- Themes ----------
-   Each theme gives: a name, the default title, the title colour,
-   a background painter and the two corner decorations beside the logo. */
+   Each theme gives: a name, the default title, the title colour, a background painter,
+   drawn corner decorations, and its default brand pictures:
+   cornerPics sit beside the logo (empty means use the drawn corners),
+   footPics sit at the bottom of the day columns. */
 
 const THEMES = {
   spring: {
+    cornerPics: ['flower', 'sun'],
+    footPics: ['duck', 'flower', 'frog', 'corn'],
     name: 'Spring',
     title: 'Spring Term',
     titleColour: BRAND.ink,
@@ -444,6 +463,8 @@ const THEMES = {
     },
   },
   easter: {
+    cornerPics: [],
+    footPics: ['flower', 'duck', 'stars-yellow-1'],
     name: 'Easter',
     title: 'Easter Term',
     titleColour: BRAND.ink,
@@ -464,6 +485,8 @@ const THEMES = {
     },
   },
   summer: {
+    cornerPics: ['sun', 'beach-ball'],
+    footPics: ['shakers-1', 'beach-ball', 'duck'],
     name: 'Summer',
     title: 'Summer Term',
     titleColour: BRAND.ink,
@@ -487,6 +510,8 @@ const THEMES = {
     },
   },
   summerHoliday: {
+    cornerPics: ['sun', 'beach-ball'],
+    footPics: ['beach-ball', 'shakers-2', 'frog'],
     name: 'Summer holiday',
     title: 'Summer Holiday Term',
     titleColour: BRAND.ink,
@@ -498,6 +523,8 @@ const THEMES = {
     },
   },
   autumn: {
+    cornerPics: [],
+    footPics: ['corn', 'rain', 'shaker-blue'],
     name: 'Autumn',
     title: 'Autumn Term',
     titleColour: BRAND.white,
@@ -519,6 +546,8 @@ const THEMES = {
     },
   },
   pumpkin: {
+    cornerPics: [],
+    footPics: ['corn', 'stars-yellow-1'],
     name: 'Baby Pumpkin',
     title: 'Baby Pumpkin',
     titleColour: BRAND.ink,
@@ -539,6 +568,8 @@ const THEMES = {
     },
   },
   christmas: {
+    cornerPics: ['jingle-bell', 'star'],
+    footPics: ['stars-yellow-1', 'jingle-bell', 'stars-green-2', 'star'],
     name: 'Christmas',
     title: 'Christmas Term',
     titleColour: BRAND.white,
@@ -561,6 +592,8 @@ const THEMES = {
     },
   },
   newYear: {
+    cornerPics: [],
+    footPics: ['stars-yellow-2', 'note-5', 'stars-green-1'],
     name: 'New Year',
     title: 'New Year Term',
     titleColour: BRAND.white,
@@ -581,6 +614,8 @@ const THEMES = {
     },
   },
   plain: {
+    cornerPics: ['note-5', 'shakers-2'],
+    footPics: ['girl', 'boy', 'friends-2', 'friends-3'],
     name: 'Everyday',
     title: 'Our Classes',
     titleColour: BRAND.ink,
