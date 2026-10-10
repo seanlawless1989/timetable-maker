@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timetable Maker</title>
+<meta name="description" content="Enter your class days and times and download a branded timetable image.">
+<style>
+  @font-face { font-family: Andika; font-weight: 400; font-display: block; src: url(fonts/Andika-400.woff2) format('woff2'); }
+  @font-face { font-family: Andika; font-weight: 700; font-display: block; src: url(fonts/Andika-700.woff2) format('woff2'); }
+
+  /* Layout: form on the left, live timetable preview on the right; stacks on phones with the preview first. */
+  :root {
+    --bg: #F5F9EE;
+    --panel: #FFFFFF;
+    --fg: #1F2A17;
+    --muted: #5C6B50;
+    --line: #DCE6CF;
+    --green: #4E9A2A;
+    --green-strong: #3E7F1E;
+    --yellow: #FBEB02;
+    --soft: #EEF6E3;
+    --danger: #B3261E;
+    --font: Andika, 'Trebuchet MS', 'Segoe UI', sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12170E; --panel: #1B2215; --fg: #EDF3E4; --muted: #A9B79C; --line: #2F3A26; --green: #8FD35F; --green-strong: #A6E07B; --soft: #222B1B; --danger: #F2827A; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font: 17px/1.45 var(--font); padding: 0 16px 48px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  header.top { display: flex; align-items: center; gap: 14px; padding-block: 20px 8px; flex-wrap: wrap; }
+  header.top .dot { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--yellow) 0 34%, #74C043 35%); flex: none; }
+  header.top h1 { font-size: 1.6rem; margin: 0; line-height: 1.1; }
+  header.top p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .grid { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 12px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } .preview { order: -1; position: static !important; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  form { display: grid; gap: 16px; }
+  fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; min-width: 0; }
+  legend { font-weight: 700; font-size: 1.05rem; padding: 0; margin-bottom: 6px; }
+  .step { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--yellow); color: #1D1D1B; font-size: 0.85rem; margin-right: 6px; }
+  label { font-size: 0.92rem; color: var(--muted); display: grid; gap: 4px; }
+  input[type=text], input[type=time], select { font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; width: 100%; min-width: 0; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .theme { display: flex; align-items: center; gap: 8px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; background: var(--bg); cursor: pointer; font: inherit; color: var(--fg); font-size: 0.95rem; text-align: left; }
+  .theme[aria-pressed=true] { border-color: var(--green); background: var(--soft); font-weight: 700; }
+  .sw { width: 24px; height: 24px; border-radius: 6px; flex: none; border: 1px solid rgba(0,0,0,0.12); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
+  .day { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: var(--bg); }
+  .day-head { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cls { display: grid; grid-template-columns: 132px 132px minmax(0, 1fr) 36px; gap: 6px; align-items: end; }
+  .cls .custom { grid-column: 3 / 4; }
+  @media (max-width: 480px) { .cls { grid-template-columns: 1fr 1fr 36px; } .cls .age { grid-column: 1 / 3; } .cls .custom { grid-column: 1 / 3; } }
+  .x { width: 36px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); font: inherit; font-size: 1.2rem; cursor: pointer; }
+  .x:hover { color: var(--danger); border-color: var(--danger); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button.link { font: inherit; font-size: 0.95rem; background: none; border: 1px dashed var(--green); color: var(--green-strong); border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+  button.link.quiet { border-color: var(--line); color: var(--muted); }
+  button.primary { font: inherit; font-weight: 700; font-size: 1.1rem; background: #74C043; color: #FFFFFF; border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; box-shadow: 0 2px 0 #3E7F1E; }
+  button.primary:hover { background: #64B033; }
+  button.secondary { font: inherit; font-size: 1rem; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px; cursor: pointer; }
+  .check { display: flex; align-items: center; gap: 8px; color: var(--fg); font-size: 0.95rem; }
+  .check input { width: 18px; height: 18px; accent-color: #74C043; }
+  .preview { position: sticky; top: 12px; display: grid; gap: 12px; }
+  .preview img { width: 100%; height: auto; border-radius: 10px; display: block; box-shadow: 0 6px 24px rgba(30,50,10,0.18); background: #FFFFFF; }
+  .preview .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .hint { color: var(--muted); font-size: 0.9rem; margin: 0; }
+  .note { color: var(--muted); font-size: 0.88rem; margin: 0; }
+  .status { color: var(--green-strong); font-size: 0.95rem; min-height: 1.4em; margin: 0; }
+  details summary { cursor: pointer; font-weight: 700; }
+  details[open] summary { margin-bottom: 10px; }
+  .confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.95rem; }
+  @media (prefers-reduced-motion: no-preference) { .theme, button { transition: background-color .15s, border-color .15s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="dot" aria-hidden="true"></div>
+    <div>
+      <h1>Timetable Maker</h1>
+      <p>Pick a theme, add your class days and times, then download your timetable.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <form id="form" class="panel" autocomplete="off">
+      <fieldset>
+        <legend><span class="step">1</span>Choose a theme</legend>
+        <div class="themes" id="themes" role="group" aria-label="Theme"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span>Name and venue</legend>
+        <label>Title at the top
+          <input type="text" id="title" maxlength="40" placeholder="Spring Term">
+        </label>
+        <label>Venue (optional, shown at the bottom)
+          <input type="text" id="venue" maxlength="60" placeholder="e.g. St Mary's Parish Hall, Norton">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span>Your classes</legend>
+        <p class="note">Add up to 6 days. Finish times are optional; leave them blank to show start times only. Use "Date or place" for one-off events or locations, such as "20th October" or "Norton".</p>
+        <div id="days" style="display:grid;gap:10px"></div>
+        <div class="btns">
+          <button type="button" class="link" id="addDay">+ Add a day</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">4</span>Size and style</legend>
+        <div class="row2">
+          <label>Size
+            <select id="size"></select>
+          </label>
+          <label>Time style
+            <select id="timeFmt">
+              <option value="ampm">10:00am</option>
+              <option value="short">10am</option>
+              <option value="24h">10:00</option>
+            </select>
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="brackets" checked> Put ages in brackets, like (0 - 13 months)</label>
+        <label class="check"><input type="checkbox" id="decorations" checked> Show the theme pictures beside the logo</label>
+      </fieldset>
+
+      <details>
+        <summary>Use your own logo or background photo</summary>
+        <div style="display:grid;gap:10px">
+          <p class="note">Optional. Use images you have the rights to, such as the official logo file or a photo from your own classes.</p>
+          <label>Logo image (PNG with a see-through background works best)
+            <input type="file" id="logoFile" accept="image/*">
+          </label>
+          <label>Background photo
+            <input type="file" id="bgFile" accept="image/*">
+          </label>
+          <div class="btns">
+            <button type="button" class="link quiet" id="clearImages">Remove my images</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="btns" id="resetRow">
+        <button type="button" class="link quiet" id="reset">Start again</button>
+      </div>
+    </form>
+
+    <section class="preview" aria-label="Your timetable">
+      <img id="out" alt="Timetable preview">
+      <div class="actions">
+        <button type="button" class="primary" id="download">Download timetable</button>
+        <button type="button" class="secondary" id="copy">Copy image</button>
+      </div>
+      <p class="status" id="status" role="status"></p>
+      <p class="hint">Your details are saved on this device, so next term you only need to change what is different. To keep editing in Canva, upload the downloaded image to a design.</p>
+    </section>
+  </div>
+</div>
+
+<canvas id="canvas" hidden></canvas>
+<script src="themes.js"></script>
+<script src="render.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
