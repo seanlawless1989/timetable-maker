@@ -6,22 +6,25 @@
 <title>Timetable Maker</title>
 <meta name="description" content="Enter your class days and times and download a branded timetable image.">
 <style>
+  @font-face { font-family: Nunito; font-weight: 200 1000; font-display: block; src: url(fonts/Nunito.woff2) format('woff2'); }
+  @font-face { font-family: Delius; font-weight: 400; font-display: block; src: url(fonts/Delius-400.woff2) format('woff2'); }
   @font-face { font-family: Andika; font-weight: 400; font-display: block; src: url(fonts/Andika-400.woff2) format('woff2'); }
-  @font-face { font-family: Andika; font-weight: 700; font-display: block; src: url(fonts/Andika-700.woff2) format('woff2'); }
 
   /* Layout: form on the left, live timetable preview on the right; stacks on phones with the preview first. */
   :root {
-    --bg: #F5F9EE;
+    /* Brand book: green #75C044, yellow #FFEB00, yellow tint, green tint, black tint #58595B */
+    --bg: #FFFCD5;
     --panel: #FFFFFF;
-    --fg: #1F2A17;
-    --muted: #5C6B50;
-    --line: #DCE6CF;
-    --green: #4E9A2A;
-    --green-strong: #3E7F1E;
-    --yellow: #FBEB02;
-    --soft: #EEF6E3;
+    --fg: #58595B;
+    --muted: #6E6F71;
+    --line: #E8F1D9;
+    --green: #75C044;
+    --green-strong: #4F9A27;
+    --yellow: #FFEB00;
+    --soft: #E8F1D9;
     --danger: #B3261E;
-    --font: Andika, 'Trebuchet MS', 'Segoe UI', sans-serif;
+    --font: Nunito, Arial, sans-serif;
+    --sub: Delius, Arial, sans-serif;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
@@ -32,15 +35,15 @@
   body { background: var(--bg); color: var(--fg); font: 17px/1.45 var(--font); padding: 0 16px 48px; }
   .wrap { max-width: 1240px; margin: 0 auto; }
   header.top { display: flex; align-items: center; gap: 14px; padding-block: 20px 8px; flex-wrap: wrap; }
-  header.top .dot { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--yellow) 0 34%, #74C043 35%); flex: none; }
-  header.top h1 { font-size: 1.6rem; margin: 0; line-height: 1.1; }
+  header.top .dot { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--yellow) 0 34%, #75C044 35%); flex: none; }
+  header.top h1 { font-size: 1.7rem; font-weight: 800; margin: 0; line-height: 1.1; color: var(--green-strong); }
   header.top p { margin: 0; color: var(--muted); font-size: 0.95rem; }
   .grid { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 12px; }
   @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } .preview { order: -1; position: static !important; } }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
   form { display: grid; gap: 16px; }
   fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; min-width: 0; }
-  legend { font-weight: 700; font-size: 1.05rem; padding: 0; margin-bottom: 6px; }
+  legend { font-family: var(--sub); font-weight: 400; font-size: 1.05rem; padding: 0; margin-bottom: 6px; }
   .step { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--yellow); color: #1D1D1B; font-size: 0.85rem; margin-right: 6px; }
   label { font-size: 0.92rem; color: var(--muted); display: grid; gap: 4px; }
   input[type=text], input[type=time], select { font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; width: 100%; min-width: 0; }
@@ -61,11 +64,11 @@
   .btns { display: flex; flex-wrap: wrap; gap: 8px; }
   button.link { font: inherit; font-size: 0.95rem; background: none; border: 1px dashed var(--green); color: var(--green-strong); border-radius: 10px; padding: 7px 12px; cursor: pointer; }
   button.link.quiet { border-color: var(--line); color: var(--muted); }
-  button.primary { font: inherit; font-weight: 700; font-size: 1.1rem; background: #74C043; color: #FFFFFF; border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; box-shadow: 0 2px 0 #3E7F1E; }
+  button.primary { font: inherit; font-weight: 800; font-size: 1.1rem; background: #75C044; color: #FFFFFF; border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; box-shadow: 0 2px 0 #3E7F1E; }
   button.primary:hover { background: #64B033; }
   button.secondary { font: inherit; font-size: 1rem; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px; cursor: pointer; }
   .check { display: flex; align-items: center; gap: 8px; color: var(--fg); font-size: 0.95rem; }
-  .check input { width: 18px; height: 18px; accent-color: #74C043; }
+  .check input { width: 18px; height: 18px; accent-color: #75C044; }
   .preview { position: sticky; top: 12px; display: grid; gap: 12px; }
   .preview img { width: 100%; height: auto; border-radius: 10px; display: block; box-shadow: 0 6px 24px rgba(30,50,10,0.18); background: #FFFFFF; }
   .preview .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -133,10 +136,10 @@
       </fieldset>
 
       <details>
-        <summary>Use your own logo or background photo</summary>
+        <summary>Use the official logo file or a background photo</summary>
         <div style="display:grid;gap:10px">
           <p class="note">Optional. Use images you have the rights to, such as the official logo file or a photo from your own classes.</p>
-          <label>Logo image (PNG with a see-through background works best)
+          <label>Official logo file (PNG with a see-through background works best)
             <input type="file" id="logoFile" accept="image/*">
           </label>
           <label>Background photo

@@ -2,7 +2,11 @@
    Layout follows the Canva timetables: logo top centre, title under it,
    one tall column per day alternating brand green and yellow. */
 
-const FONT = "Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif";
+// Brand book fonts: Museo Sans Rounded (headers bold, body) and Delius (sub-headers).
+// Museo Sans Rounded is a paid font, so Nunito (free, rounded) stands in for it.
+const FONT = "Nunito, Arial, sans-serif";
+const SUB_FONT = "Delius, Arial, sans-serif";
+const LOGO_FONT = "Andika, Arial, sans-serif";
 
 const SIZES = {
   post: { label: 'Facebook post (same as your Canva)', W: 940, H: 788, scale: 2 },
@@ -57,64 +61,80 @@ function wrapText(c, text, maxW) {
   return out;
 }
 
-/* Logo badge drawn in code. If an official logo file is uploaded it is used instead. */
+/* Logo cloud drawn in code to match the brand book's primary logo.
+   The brand book asks for the original artwork, so a logo.png placed next to
+   index.html (or uploaded in the form) is always used instead when present. */
+const CLOUD = [
+  [0.10, 0.30], [0.17, 0.06], [0.32, 0.02], [0.48, 0.08], [0.66, 0.0], [0.84, 0.05],
+  [0.91, 0.28], [0.98, 0.52], [0.99, 0.80], [0.93, 0.97], [0.70, 1.0], [0.45, 0.96],
+  [0.20, 1.0], [0.04, 0.95], [0.0, 0.70], [0.04, 0.45],
+];
+
+function cloudPath(c, x, y, w, h) {
+  // closed Catmull-Rom spline through the cloud points
+  const P = CLOUD.map(([px, py]) => [x + px * w, y + py * h]);
+  const n = P.length;
+  c.beginPath();
+  c.moveTo(P[0][0], P[0][1]);
+  for (let i = 0; i < n; i++) {
+    const p0 = P[(i - 1 + n) % n], p1 = P[i], p2 = P[(i + 1) % n], p3 = P[(i + 2) % n];
+    c.bezierCurveTo(
+      p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
+      p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6,
+      p2[0], p2[1]);
+  }
+  c.closePath();
+}
+
 function drawLogo(c, cx, top, w, s, logoImg) {
-  const h = w * 0.34;
+  const h = w * 0.3;
   if (logoImg) {
-    const k = Math.min((w * 1.05) / logoImg.width, (h * 1.15) / logoImg.height);
+    const k = Math.min((w * 1.05) / logoImg.width, (h * 1.25) / logoImg.height);
     const iw = logoImg.width * k, ih = logoImg.height * k;
     c.drawImage(logoImg, cx - iw / 2, top + (h - ih) / 2, iw, ih);
     return top + h;
   }
-  const cy = top + h / 2;
-  const blob = (scale, wobble) => {
-    c.beginPath();
-    const N = 160;
-    for (let i = 0; i <= N; i++) {
-      const t = (i / N) * Math.PI * 2;
-      const ct = Math.cos(t), st = Math.sin(t);
-      const x = Math.sign(ct) * Math.pow(Math.abs(ct), 0.45) * (w / 2) * scale;
-      const y = Math.sign(st) * Math.pow(Math.abs(st), 0.45) * (h / 2) * scale;
-      const wob = 1 + wobble * Math.sin(t * 6);
-      const px = cx + x * wob, py = cy + y * (1 + wobble * 1.6 * Math.sin(t * 6));
-      i ? c.lineTo(px, py) : c.moveTo(px, py);
-    }
-    c.closePath();
-  };
+  const x = cx - w / 2, y = top;
+  const band = h * 0.085;
+  // white border (shows on non-white backgrounds, as the brand book notes)
   c.save();
-  c.shadowColor = 'rgba(0,0,0,0.18)';
-  c.shadowBlur = 8 * s;
-  c.shadowOffsetY = 2 * s;
-  blob(1, 0.025);
-  c.fillStyle = BRAND.green;
+  c.shadowColor = 'rgba(0,0,0,0.15)';
+  c.shadowBlur = 6 * s;
+  cloudPath(c, x - band, y - band, w + band * 2, h + band * 2);
+  c.fillStyle = BRAND.white;
   c.fill();
   c.restore();
-  blob(0.93, 0.025);
-  c.strokeStyle = 'rgba(255,255,255,0.95)';
-  c.lineWidth = 2.6 * s;
-  c.setLineDash([0.1, 5.5 * s]);
+  // dotted edge inside the white border
+  cloudPath(c, x - band * 0.45, y - band * 0.45, w + band * 0.9, h + band * 0.9);
+  c.strokeStyle = '#A8D57D';
+  c.lineWidth = band * 0.32;
+  c.setLineDash([0.1, band * 0.55]);
   c.lineCap = 'round';
   c.stroke();
   c.setLineDash([]);
+  cloudPath(c, x, y, w, h);
+  c.fillStyle = BRAND.green;
+  c.fill();
+
   c.textAlign = 'center';
   c.textBaseline = 'alphabetic';
-  let fs = h * 0.4;
-  c.font = `400 ${fs}px ${FONT}`;
+  const fs = h * 0.36;
+  c.font = `400 ${fs}px ${LOGO_FONT}`;
   c.fillStyle = BRAND.yellow;
-  c.fillText('Baby Sensory', cx, cy + h * 0.05);
+  c.fillText('Baby Sensory', cx, y + h * 0.52);
   const tw = c.measureText('Baby Sensory').width;
-  c.font = `400 ${fs * 0.28}px ${FONT}`;
-  c.fillText('TM', cx + tw / 2 + fs * 0.2, cy - h * 0.18);
-  let ts = h * 0.155;
-  c.font = `400 ${ts}px ${FONT}`;
+  c.font = `400 ${fs * 0.22}px ${LOGO_FONT}`;
+  c.fillText('TM', cx + tw / 2 + fs * 0.16, y + h * 0.27);
+  let ts = h * 0.15;
+  c.font = `400 ${ts}px ${LOGO_FONT}`;
   const tag = 'Precious Early Learning for Babies';
-  while (c.measureText(tag).width > w * 0.82) {
+  while (c.measureText(tag).width > w * 0.78) {
     ts *= 0.95;
-    c.font = `400 ${ts}px ${FONT}`;
+    c.font = `400 ${ts}px ${LOGO_FONT}`;
   }
-  c.fillStyle = BRAND.white;
-  c.fillText(tag, cx, cy + h * 0.3);
-  return top + h;
+  c.fillStyle = BRAND.greenTint;
+  c.fillText(tag, cx, y + h * 0.78);
+  return top + h + band;
 }
 
 function drawCover(c, img, W, H) {
@@ -155,11 +175,11 @@ function drawTimetable(canvas, state, images = {}) {
   // Title
   const title = (state.title || '').trim();
   let titleSize = 54 * s;
-  c.font = `700 ${titleSize}px ${FONT}`;
+  c.font = `800 ${titleSize}px ${FONT}`;
   const titleMax = W - 2 * (margin + 120 * s);
   while (title && c.measureText(title).width > titleMax && titleSize > 24 * s) {
     titleSize *= 0.95;
-    c.font = `700 ${titleSize}px ${FONT}`;
+    c.font = `800 ${titleSize}px ${FONT}`;
   }
   const titleBase = logoBottom + 14 * s + titleSize * 0.85;
   if (title) {
@@ -180,10 +200,10 @@ function drawTimetable(canvas, state, images = {}) {
   let colBottom = H - (W > H ? 0 : 30 * s);
   if (venue) {
     let vs = 24 * s;
-    c.font = `700 ${vs}px ${FONT}`;
+    c.font = `800 ${vs}px ${FONT}`;
     while (c.measureText(venue).width > W - 2 * margin - 40 * s && vs > 12 * s) {
       vs *= 0.95;
-      c.font = `700 ${vs}px ${FONT}`;
+      c.font = `800 ${vs}px ${FONT}`;
     }
     const pillH = vs * 1.9;
     const pillW = c.measureText(venue).width + 48 * s;
@@ -192,7 +212,7 @@ function drawTimetable(canvas, state, images = {}) {
     c.beginPath();
     c.roundRect(W / 2 - pillW / 2, pillY, pillW, pillH, pillH / 2);
     c.fill();
-    c.fillStyle = '#3E7F1E';
+    c.fillStyle = BRAND.green;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
     c.fillText(venue, W / 2, pillY + pillH / 2 + vs * 0.04);
@@ -237,7 +257,7 @@ function drawTimetable(canvas, state, images = {}) {
   function layoutDay(d, k, cell) {
     const z = sizesAt(Math.min(k, 1.25));
     const maxW = colW - 2 * pad;
-    c.font = `700 ${z.head}px ${FONT}`;
+    c.font = `400 ${z.head}px ${SUB_FONT}`;
     const head = d.day ? [d.day] : [];
     let ok = head.every((t) => c.measureText(t).width <= maxW);
     c.font = `400 ${z.note}px ${FONT}`;
@@ -247,8 +267,11 @@ function drawTimetable(canvas, state, images = {}) {
       const lines = [];
       for (const ln of classLines(cls, opts)) {
         const px = z[ln.kind];
-        c.font = `${ln.kind === 'age' ? 400 : 700} ${px}px ${FONT}`;
-        for (const t of wrapText(c, ln.text, maxW)) {
+        c.font = `${ln.kind === 'age' ? 700 : 800} ${px}px ${FONT}`;
+        const wrapped = wrapText(c, ln.text, maxW);
+        // prefer slightly smaller text over breaking a short line in two
+        if (wrapped.length > 1 && k > 0.8 && ln.kind !== 'time') ok = false;
+        for (const t of wrapped) {
           if (c.measureText(t).width > maxW) ok = false;
           lines.push({ text: t, kind: ln.kind, px });
         }
@@ -275,8 +298,9 @@ function drawTimetable(canvas, state, images = {}) {
     const x = cell.x;
     const green = cell.green;
     const fill = green ? BRAND.green : BRAND.yellow;
-    const headCol = green ? BRAND.yellow : '#4E9A2A';
-    const bodyCol = green ? BRAND.white : BRAND.ink;
+    // Brand book pairings: yellow or white on green, green on yellow
+    const headCol = green ? BRAND.yellow : BRAND.green;
+    const bodyCol = green ? BRAND.white : BRAND.green;
     c.fillStyle = fill;
     c.beginPath();
     c.roundRect(x, cell.top, colW + (cell.last ? 0 : 0.5), cell.bottom - cell.top, [4 * s, 4 * s, radius, radius]);
@@ -292,9 +316,14 @@ function drawTimetable(canvas, state, images = {}) {
     c.textAlign = 'center';
     let y = cell.top + 18 * s;
     c.fillStyle = headCol;
-    c.font = `700 ${L.z.head}px ${FONT}`;
+    c.font = `400 ${L.z.head}px ${SUB_FONT}`;
     for (const t of L.head) {
       y += L.z.head;
+      // Delius only comes in one weight, so thicken it slightly for legibility
+      c.strokeStyle = headCol;
+      c.lineWidth = L.z.head * 0.045;
+      c.lineJoin = 'round';
+      c.strokeText(t, cx, y);
       c.fillText(t, cx, y);
       y += L.z.head * 0.25;
     }
@@ -314,7 +343,7 @@ function drawTimetable(canvas, state, images = {}) {
     c.fillStyle = bodyCol;
     for (const b of L.blocks) {
       for (const ln of b.lines) {
-        c.font = `${ln.kind === 'age' ? 400 : 700} ${ln.px}px ${FONT}`;
+        c.font = `${ln.kind === 'age' ? 700 : 800} ${ln.px}px ${FONT}`;
         y += ln.px;
         c.fillText(ln.text, cx, y);
         y += ln.px * (lineH - 1);

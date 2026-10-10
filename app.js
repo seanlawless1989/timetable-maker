@@ -285,8 +285,9 @@ function bindTopFields() {
       reader.readAsDataURL(file);
     });
   }
-  $('clearImages').addEventListener('click', () => {
-    images.logo = images.background = null;
+  $('clearImages').addEventListener('click', async () => {
+    images.logo = await loadImage('logo.png');
+    images.background = null;
     saveImage('logo', null);
     saveImage('background', null);
     $('logoFile').value = '';
@@ -359,9 +360,11 @@ $('form').addEventListener('submit', (e) => e.preventDefault());
       if (src) images[key] = await loadImage(src);
     }
   } catch { /* ignore */ }
+  // The official logo artwork, if logo.png has been added next to index.html
+  if (!images.logo) images.logo = await loadImage('logo.png');
   renderThemes();
   bindTopFields();
   renderDays();
-  try { await document.fonts.load(`700 30px Andika`); await document.fonts.load(`400 30px Andika`); } catch { /* fallback font */ }
+  try { await Promise.all(['800 30px Nunito', '700 30px Nunito', '400 30px Delius', '400 30px Andika'].map((f) => document.fonts.load(f))); } catch { /* fallback font */ }
   draw();
 })();

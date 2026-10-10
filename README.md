@@ -30,8 +30,8 @@ Double-click `index.html`. It works offline because the fonts are included.
 ## Changing the look
 
 - **Themes** are in `themes.js`. Each theme has a name, default title, title colour, a background and two corner decorations. Copy one and edit it to add a new theme.
-- **Brand colours** are at the top of `themes.js` (green `#74C043`, yellow `#FBEB02`, matched from your Canva timetables).
+- **Brand colours** are at the top of `themes.js`, taken from the Baby Sensory brand book: green `#75C044`, yellow `#FFEB00`, yellow tint `#FFFCD5`, green tint `#E8F1D9` and black tint `#58595B`. Text follows the brand book's pairings: yellow or white on green, green on yellow.
 - **Age groups** in the drop-down are the `AGES` list at the top of `app.js`.
 - **Sizes** are the `SIZES` list at the top of `render.js`.
-- **Font** is Andika (free, Open Font License), the closest free match to the rounded font in the Canva designs.
-- **Logo**: the badge is drawn in code to match the one in your Canva designs. Franchisees can also upload the official logo file under "Use your own logo or background photo". To make the official file the default for everyone, save it as `logo.png` next to `index.html` and ask Claude to switch it on.
+- **Fonts** follow the brand book: Delius for the day names (sub-headers), and Nunito in place of Museo Sans Rounded for the title and times. Museo Sans Rounded is a paid font; if you have a web licence for it, add the file to `fonts/` and swap it in at the top of `render.js`.
+- **Logo**: the brand book asks for the original logo artwork. Upload the primary logo from the Knowledge Library as `logo.png` next to `index.html` and every timetable uses it automatically. Until then a drawn copy of the cloud logo is used. Franchisees can also upload the logo file in the form.

@@ -3,10 +3,13 @@
    so every timetable comes out the same way from the same details.
    To add a theme: copy one of the entries in THEMES at the bottom and change it. */
 
+/* Colours from the Baby Sensory brand book */
 const BRAND = {
-  green: '#74C043',
-  yellow: '#FBEB02',
-  ink: '#1D1D1B',
+  green: '#75C044',
+  yellow: '#FFEB00',
+  yellowTint: '#FFFCD5',
+  greenTint: '#E8F1D9',
+  ink: '#58595B', // brand black, an 80% tint
   white: '#FFFFFF',
 };
 
@@ -581,12 +584,12 @@ const THEMES = {
     name: 'Everyday',
     title: 'Our Classes',
     titleColour: BRAND.ink,
-    swatch: ['#FFFFFF', '#74C043'],
+    swatch: ['#FFFCD5', '#75C044'],
     background(c, W, H, s) {
-      c.fillStyle = vGradient(c, H, [[0, '#FFFFFF'], [1, '#F2F9E8']]);
+      c.fillStyle = vGradient(c, H, [[0, BRAND.yellowTint], [1, BRAND.greenTint]]);
       c.fillRect(0, 0, W, H);
       scatter(c, W, H, 40, 17, (x, y, rnd, i) => {
-        c.fillStyle = i % 2 ? 'rgba(116,192,67,0.18)' : 'rgba(251,235,2,0.3)';
+        c.fillStyle = i % 2 ? 'rgba(117,192,68,0.18)' : 'rgba(255,235,0,0.3)';
         c.beginPath();
         c.arc(x, y, (6 + rnd() * 16) * s, 0, Math.PI * 2);
         c.fill();
