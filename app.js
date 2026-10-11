@@ -216,6 +216,16 @@ function renderDays() {
       del.textContent = '×';
       del.addEventListener('click', () => { d.classes.splice(ci, 1); renderDays(); scheduleDraw(); });
 
+      const stL = document.createElement('label');
+      stL.className = 'sticker';
+      stL.textContent = 'Sticker';
+      const st = document.createElement('select');
+      st.id = `sticker-${di}-${ci}`;
+      st.append(option('', 'None', !cls.sticker), option('last', 'LAST SPACE', cls.sticker === 'last'),
+        option('few', 'LAST FEW SPACES', cls.sticker === 'few'), option('sold', 'SOLD OUT', cls.sticker === 'sold'));
+      st.addEventListener('change', () => { cls.sticker = st.value; scheduleDraw(); });
+      stL.appendChild(st);
+
       row.append(startL, endL, ageL, del);
 
       if (cls.age === 'custom') {
@@ -232,6 +242,7 @@ function renderDays() {
         cl.appendChild(ci2);
         row.appendChild(cl);
       }
+      row.appendChild(stL);
       age.addEventListener('change', () => {
         const wasCustom = cls.age === 'custom';
         cls.age = age.value;
@@ -260,6 +271,7 @@ function renderDays() {
     copy.disabled = state.days.length >= 6;
     copy.addEventListener('click', () => {
       const next = clone(d);
+      next.classes.forEach((c) => delete c.sticker);
       next.day = DAYS[(DAYS.indexOf(d.day) + 1) % 7];
       state.days.splice(di + 1, 0, next);
       renderDays();

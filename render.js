@@ -45,6 +45,42 @@ function classLines(cls, opts) {
   return lines;
 }
 
+const STICKERS = { sold: 'SOLD OUT', last: 'LAST SPACE', few: 'LAST FEW SPACES' };
+
+// A tilted label stuck across a class, like a "sold out" sticker on a poster
+function drawSticker(c, text, cx, cy, colW, px, onGreen, s) {
+  let size = px * 0.95;
+  c.font = `900 ${size}px ${FONT}`;
+  const maxW = colW * 0.86 - size * 1.2;
+  while (c.measureText(text).width > maxW && size > 9 * s) {
+    size *= 0.94;
+    c.font = `900 ${size}px ${FONT}`;
+  }
+  const w = c.measureText(text).width + size * 1.2;
+  const h = size * 1.75;
+  c.save();
+  c.translate(cx, cy);
+  c.rotate(-0.07);
+  c.shadowColor = 'rgba(0,0,0,0.3)';
+  c.shadowBlur = 8 * s;
+  c.shadowOffsetY = 3 * s;
+  c.fillStyle = BRAND.white;
+  c.beginPath();
+  c.roundRect(-w / 2 - 4 * s, -h / 2 - 4 * s, w + 8 * s, h + 8 * s, 10 * s);
+  c.fill();
+  c.shadowColor = 'transparent';
+  // brand pairings: green on yellow, yellow on green
+  c.fillStyle = onGreen ? BRAND.yellow : BRAND.green;
+  c.beginPath();
+  c.roundRect(-w / 2, -h / 2, w, h, 7 * s);
+  c.fill();
+  c.fillStyle = onGreen ? BRAND.green : BRAND.yellow;
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText(text, 0, size * 0.05);
+  c.restore();
+}
+
 function wrapText(c, text, maxW) {
   const words = text.split(/\s+/).filter(Boolean);
   const out = [];
@@ -293,8 +329,11 @@ function drawTimetable(canvas, state, images = {}) {
           lines.push({ text: t, kind: ln.kind, px });
         }
       }
-      const h = lines.reduce((a, l) => a + l.px * lineH, 0);
-      return { lines, h };
+      const sticker = STICKERS[cls.sticker] || '';
+      // room under the class for its sticker, so the time and age stay readable
+      const stickerH = sticker ? z.time * 2 : 0;
+      const h = lines.reduce((a, l) => a + l.px * lineH, 0) + stickerH;
+      return { lines, h, sticker, stickerH, stickerPx: z.time * 0.82 };
     }).filter((b) => b.lines.length);
     const headH = head.length * z.head * 1.25 + note.length * z.note * lineH;
     const startY = cell.top + 18 * s + headH + 14 * s;
@@ -360,6 +399,7 @@ function drawTimetable(canvas, state, images = {}) {
     const gap = nb > 0 ? Math.min(free / (nb + 0.4), maxGap) : 0;
     y = L.startY + gap * 0.25;
     c.fillStyle = bodyCol;
+    const stickers = [];
     for (const b of L.blocks) {
       for (const ln of b.lines) {
         c.font = `${ln.kind === 'age' ? 700 : 800} ${ln.px}px ${FONT}`;
@@ -367,8 +407,14 @@ function drawTimetable(canvas, state, images = {}) {
         c.fillText(ln.text, cx, y);
         y += ln.px * (lineH - 1);
       }
+      if (b.sticker) {
+        stickers.push({ text: b.sticker, mid: y + b.stickerH * 0.56, px: b.stickerPx });
+        y += b.stickerH;
+      }
       y += Math.max(gap, blockGapMin);
     }
+    // stickers use the other column colour so they stand out
+    for (const st of stickers) drawSticker(c, st.text, cx, st.mid, colW, st.px, green, s);
 
     // Brand picture in the space left at the bottom of the column
     if (footIds.length) {

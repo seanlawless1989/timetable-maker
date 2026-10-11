@@ -66,7 +66,8 @@
   .day-head { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .cls { display: grid; grid-template-columns: 132px 132px minmax(0, 1fr) 36px; gap: 6px; align-items: end; }
   .cls .custom { grid-column: 3 / 4; }
-  @media (max-width: 480px) { .cls { grid-template-columns: 1fr 1fr 36px; } .cls .age { grid-column: 1 / 3; } .cls .custom { grid-column: 1 / 3; } }
+  .cls .sticker { grid-column: 1 / 3; }
+  @media (max-width: 480px) { .cls { grid-template-columns: 1fr 1fr 36px; } .cls .age { grid-column: 1 / 3; } .cls .custom { grid-column: 1 / 3; } .cls .sticker { grid-column: 1 / 3; } }
   .x { width: 36px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); font: inherit; font-size: 1.2rem; cursor: pointer; }
   .x:hover { color: var(--danger); border-color: var(--danger); }
   .btns { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -137,7 +138,7 @@
 
       <fieldset>
         <legend><span class="step">4</span>Your classes</legend>
-        <p class="note">Add up to 6 days. Finish times are optional; leave them blank to show start times only. Use "Date or place" for one-off events or locations, such as "20th October" or "Norton".</p>
+        <p class="note">Add up to 6 days. Finish times are optional; leave them blank to show start times only. Add a "Sticker" to show a class is SOLD OUT or has a LAST SPACE. Use "Date or place" for one-off events or locations, such as "20th October" or "Norton".</p>
         <div id="days" style="display:grid;gap:10px"></div>
         <div class="btns">
           <button type="button" class="link" id="addDay">+ Add a day</button>
