@@ -48,7 +48,7 @@ function classLines(cls, opts) {
 const STICKERS = { sold: 'SOLD OUT', last: 'LAST SPACE', few: 'LAST FEW SPACES' };
 
 // A tilted label stuck across a class, like a "sold out" sticker on a poster
-function drawSticker(c, text, cx, cy, colW, px, onGreen, s) {
+function drawSticker(c, text, cx, cy, colW, px, onGreen, s, tilt, coverH = 0) {
   let size = px * 0.95;
   c.font = `900 ${size}px ${FONT}`;
   const maxW = colW * 0.86 - size * 1.2;
@@ -56,11 +56,12 @@ function drawSticker(c, text, cx, cy, colW, px, onGreen, s) {
     size *= 0.94;
     c.font = `900 ${size}px ${FONT}`;
   }
-  const w = c.measureText(text).width + size * 1.2;
-  const h = size * 1.75;
+  // a sold-out sticker is sized to hide the whole class underneath it
+  const w = Math.max(c.measureText(text).width + size * 1.2, coverH ? colW * 0.84 : 0);
+  const h = Math.max(size * 1.75, coverH * 1.02);
   c.save();
   c.translate(cx, cy);
-  c.rotate(-0.07);
+  c.rotate(tilt);
   c.shadowColor = 'rgba(0,0,0,0.3)';
   c.shadowBlur = 8 * s;
   c.shadowOffsetY = 3 * s;
@@ -330,8 +331,8 @@ function drawTimetable(canvas, state, images = {}) {
         }
       }
       const sticker = STICKERS[cls.sticker] || '';
-      // room under the class for its sticker, so the time and age stay readable
-      const stickerH = sticker ? z.time * 2 : 0;
+      // LAST SPACE stickers go under the class so it stays readable; SOLD OUT covers it
+      const stickerH = sticker && cls.sticker !== 'sold' ? z.time * 2 : 0;
       const h = lines.reduce((a, l) => a + l.px * lineH, 0) + stickerH;
       return { lines, h, sticker, stickerH, stickerPx: z.time * 0.82 };
     }).filter((b) => b.lines.length);
@@ -401,20 +402,24 @@ function drawTimetable(canvas, state, images = {}) {
     c.fillStyle = bodyCol;
     const stickers = [];
     for (const b of L.blocks) {
+      const blockTop = y;
       for (const ln of b.lines) {
         c.font = `${ln.kind === 'age' ? 700 : 800} ${ln.px}px ${FONT}`;
         y += ln.px;
         c.fillText(ln.text, cx, y);
         y += ln.px * (lineH - 1);
       }
-      if (b.sticker) {
-        stickers.push({ text: b.sticker, mid: y + b.stickerH * 0.56, px: b.stickerPx });
+      if (b.sticker && !b.stickerH) {
+        // sold out: stuck across the time, bigger and tilted more
+        stickers.push({ text: b.sticker, mid: (blockTop + y) / 2 + b.lines[0].px * 0.08, px: b.stickerPx * 1.3, tilt: -0.1, coverH: y - blockTop });
+      } else if (b.sticker) {
+        stickers.push({ text: b.sticker, mid: y + b.stickerH * 0.56, px: b.stickerPx, tilt: -0.07 });
         y += b.stickerH;
       }
       y += Math.max(gap, blockGapMin);
     }
     // stickers use the other column colour so they stand out
-    for (const st of stickers) drawSticker(c, st.text, cx, st.mid, colW, st.px, green, s);
+    for (const st of stickers) drawSticker(c, st.text, cx, st.mid, colW, st.px, green, s, st.tilt, st.coverH);
 
     // Brand picture in the space left at the bottom of the column
     if (footIds.length) {
