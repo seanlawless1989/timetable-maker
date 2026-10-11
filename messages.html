@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Message Templates</title>
+<meta name="description" content="Ready-to-send messages for parents, filled in with your classes.">
+<style>
+  @font-face { font-family: Nunito; font-weight: 200 1000; font-display: block; src: url(fonts/Nunito.woff2) format('woff2'); }
+  @font-face { font-family: Delius; font-weight: 400; font-display: block; src: url(fonts/Delius-400.woff2) format('woff2'); }
+  @font-face { font-family: Andika; font-weight: 400; font-display: block; src: url(fonts/Andika-400.woff2) format('woff2'); }
+
+  /* Layout: form on the left, live timetable preview on the right; stacks on phones with the preview first. */
+  :root {
+    /* Brand book: green #75C044, yellow #FFEB00, yellow tint, green tint, black tint #58595B */
+    --bg: #FFFCD5;
+    --panel: #FFFFFF;
+    --fg: #58595B;
+    --muted: #6E6F71;
+    --line: #E8F1D9;
+    --green: #75C044;
+    --green-strong: #4F9A27;
+    --yellow: #FFEB00;
+    --soft: #E8F1D9;
+    --danger: #B3261E;
+    --font: Nunito, Arial, sans-serif;
+    --sub: Delius, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12170E; --panel: #1B2215; --fg: #EDF3E4; --muted: #A9B79C; --line: #2F3A26; --green: #8FD35F; --green-strong: #A6E07B; --soft: #222B1B; --danger: #F2827A; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font: 17px/1.45 var(--font); padding: 0 16px 48px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  header.top { display: flex; align-items: center; gap: 14px; padding-block: 20px 8px; flex-wrap: wrap; }
+  header.top .dot { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--yellow) 0 34%, #75C044 35%); flex: none; }
+  header.top h1 { font-size: 1.7rem; font-weight: 800; margin: 0; line-height: 1.1; color: var(--green-strong); }
+  header.top p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .grid { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 12px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } .preview { order: -1; position: static !important; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  form { display: grid; gap: 16px; }
+  fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; min-width: 0; }
+  legend { font-family: var(--sub); font-weight: 400; font-size: 1.05rem; padding: 0; margin-bottom: 6px; }
+  .step { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--yellow); color: #1D1D1B; font-size: 0.85rem; margin-right: 6px; }
+  label { font-size: 0.92rem; color: var(--muted); display: grid; gap: 4px; }
+  input[type=text], input[type=time], input[type=tel], input[type=url], input[type=date], select { font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; width: 100%; min-width: 0; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  .themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .theme { display: flex; align-items: center; gap: 8px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; background: var(--bg); cursor: pointer; font: inherit; color: var(--fg); font-size: 0.95rem; text-align: left; }
+  .theme[aria-pressed=true] { border-color: var(--green); background: var(--soft); font-weight: 700; }
+  .sw { width: 24px; height: 24px; border-radius: 6px; flex: none; border: 1px solid rgba(0,0,0,0.12); }
+  .pics { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; margin-top: 6px; }
+  .pic { position: relative; aspect-ratio: 1; border: 2px solid var(--line); border-radius: 10px; background: var(--panel); padding: 4px; cursor: pointer; display: grid; place-items: center; }
+  .pic { min-height: 0; }
+  .pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .pic[aria-pressed=true] { border-color: var(--green); background: var(--soft); }
+  .pic .n { position: absolute; top: 2px; right: 2px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--green); color: #FFFFFF; font-size: 0.75rem; font-weight: 800; display: grid; place-items: center; padding: 0 4px; }
+  .pic .n:empty { display: none; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
+  .day { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: var(--bg); }
+  .day-head { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cls { display: grid; grid-template-columns: 132px 132px minmax(0, 1fr) 36px; gap: 6px; align-items: end; }
+  .cls .custom { grid-column: 3 / 4; }
+  .cls .sticker { grid-column: 1 / 3; }
+  @media (max-width: 480px) { .cls { grid-template-columns: 1fr 1fr 36px; } .cls .age { grid-column: 1 / 3; } .cls .custom { grid-column: 1 / 3; } .cls .sticker { grid-column: 1 / 3; } }
+  .x { width: 36px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); font: inherit; font-size: 1.2rem; cursor: pointer; }
+  .x:hover { color: var(--danger); border-color: var(--danger); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button.link { font: inherit; font-size: 0.95rem; background: none; border: 1px dashed var(--green); color: var(--green-strong); border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+  button.link.quiet { border-color: var(--line); color: var(--muted); }
+  button.primary { font: inherit; font-weight: 800; font-size: 1.1rem; background: #75C044; color: #FFFFFF; border: 0; border-radius: 12px; padding: 12px 20px; cursor: pointer; box-shadow: 0 2px 0 #3E7F1E; }
+  button.primary:hover { background: #64B033; }
+  button.secondary { font: inherit; font-size: 1rem; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px; cursor: pointer; }
+  .check { display: flex; align-items: center; gap: 8px; color: var(--fg); font-size: 0.95rem; }
+  .check input { width: 18px; height: 18px; accent-color: #75C044; }
+  .preview { position: sticky; top: 12px; display: grid; gap: 12px; }
+  .preview img { width: 100%; height: auto; border-radius: 10px; display: block; box-shadow: 0 6px 24px rgba(30,50,10,0.18); background: #FFFFFF; }
+  .preview .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .hint { color: var(--muted); font-size: 0.9rem; margin: 0; }
+  .note { color: var(--muted); font-size: 0.88rem; margin: 0; }
+  .status { color: var(--green-strong); font-size: 0.95rem; min-height: 1.4em; margin: 0; }
+  details summary { cursor: pointer; font-weight: 700; }
+  details[open] summary { margin-bottom: 10px; }
+  .confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.95rem; }
+  @media (prefers-reduced-motion: no-preference) { .theme, button { transition: background-color .15s, border-color .15s; } }
+  .nav { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+  .nav a { font-size: 0.95rem; color: var(--green-strong); text-decoration: none; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; }
+  .nav a[aria-current=page] { background: var(--green); border-color: var(--green); color: #FFFFFF; font-weight: 700; }
+  .themes.msgs { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  textarea { font: inherit; font-size: 1rem; line-height: 1.5; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; width: 100%; min-height: 340px; resize: vertical; }
+  textarea:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+  a.primary, a.secondary { text-decoration: none; display: inline-block; }
+  a.primary { font-weight: 800; font-size: 1.1rem; background: #75C044; color: #FFFFFF; border-radius: 12px; padding: 12px 20px; box-shadow: 0 2px 0 #3E7F1E; }
+  a.primary:hover { background: #64B033; }
+  a.secondary { font-size: 1rem; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px; }
+  .classes { display: grid; gap: 6px; }
+  .tip { background: var(--soft); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; }
+  .tip p { margin: 0 0 6px; }
+  .tip ol { margin: 0; padding-left: 20px; }
+  @media (max-width: 900px) { .preview { order: 0; } textarea { min-height: 260px; } }
+  code { font-family: var(--font); font-weight: 800; color: var(--green-strong); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="dot" aria-hidden="true"></div>
+    <div>
+      <h1>Message Templates</h1>
+      <p>Pick a message, check the details, then send it in WhatsApp or copy it.</p>
+    </div>
+    <nav class="nav" aria-label="Tools">
+      <a href="index.html">Timetable</a>
+      <a href="messages.html" aria-current="page">Messages</a>
+    </nav>
+  </header>
+
+  <div class="grid">
+    <form class="panel" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend><span class="step">1</span>Choose a message</legend>
+        <div class="themes msgs" id="templates" role="group" aria-label="Message"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span>Who and when</legend>
+        <p class="note" id="noClasses" hidden>Add your classes on the <a href="index.html">Timetable</a> page first, and they'll appear here.</p>
+        <div class="row2">
+          <label id="f-parent">Parent's first name (optional)
+            <input type="text" id="parent" maxlength="40" placeholder="e.g. Sarah">
+          </label>
+          <label>Their mobile (optional)
+            <input type="tel" id="parentPhone" maxlength="20" placeholder="Leave blank to choose in WhatsApp">
+          </label>
+        </div>
+        <label id="f-cls">Class
+          <select id="cls"></select>
+        </label>
+        <div id="f-classes">
+          <p class="note">Classes with spaces (ones marked LAST SPACE or LAST FEW SPACES on your timetable are ticked for you)</p>
+          <div class="classes" id="classes"></div>
+        </div>
+        <div class="row2">
+          <label id="f-date"><span id="dateLabel">Date</span>
+            <input type="date" id="date">
+          </label>
+          <label id="f-deadline">Reply or rebook by (optional)
+            <input type="date" id="deadline">
+          </label>
+        </div>
+        <label id="f-reason">Reason (optional)
+          <input type="text" id="reason" maxlength="80" placeholder="e.g. due to illness">
+        </label>
+        <label id="f-extra"><span id="extraLabel">Anything else</span>
+          <input type="text" id="extra" maxlength="160">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span>Your details</legend>
+        <p class="note">Saved on this device, so you only type them once.</p>
+        <div class="row2">
+          <label>Your first name
+            <input type="text" id="name" maxlength="40" placeholder="e.g. Emma">
+          </label>
+          <label>Your Baby Sensory area
+            <input type="text" id="area" maxlength="60" placeholder="e.g. Baby Sensory Norton">
+          </label>
+          <label>Your phone (optional)
+            <input type="tel" id="phone" maxlength="20" placeholder="e.g. 07700 900123">
+          </label>
+          <label>Booking link (optional)
+            <input type="url" id="link" maxlength="200" placeholder="Your GEMA booking page">
+          </label>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="preview" aria-label="Your message">
+      <label for="out" class="note">Your message (you can edit it before sending)</label>
+      <textarea id="out" spellcheck="true"></textarea>
+      <p class="note" id="editedNote" hidden>You've edited this message. Changing the details on the left will replace your edits. <button type="button" class="link quiet" id="resetText">Undo my edits</button></p>
+      <div class="actions">
+        <a class="primary" id="wa" href="#" target="_blank" rel="noopener">Send in WhatsApp</a>
+        <button type="button" class="secondary" id="copy">Copy</button>
+        <a class="secondary" id="mail" href="#">Email</a>
+      </div>
+      <p class="status" id="status" role="status"></p>
+      <div class="tip">
+        <p><strong>Save it as a WhatsApp Business quick reply</strong></p>
+        <ol>
+          <li>In WhatsApp Business, open <strong>Settings → Business tools → Quick replies</strong> and tap <strong>+</strong>.</li>
+          <li>Paste this message and give it the shortcut <code id="shortcut">/welcome</code>.</li>
+          <li>In any chat, type <code>/</code> and pick it from the list.</li>
+        </ol>
+      </div>
+      <p class="hint">Nothing is sent until you press send in WhatsApp or your email. Your details stay on this device.</p>
+    </section>
+  </div>
+</div>
+<script src="messages.js?v=1"></script>
+</body>
+</html>

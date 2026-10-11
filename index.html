@@ -88,6 +88,9 @@
   details[open] summary { margin-bottom: 10px; }
   .confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.95rem; }
   @media (prefers-reduced-motion: no-preference) { .theme, button { transition: background-color .15s, border-color .15s; } }
+  .nav { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+  .nav a { font-size: 0.95rem; color: var(--green-strong); text-decoration: none; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; }
+  .nav a[aria-current=page] { background: var(--green); border-color: var(--green); color: #FFFFFF; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -98,6 +101,10 @@
       <h1>Timetable Maker</h1>
       <p>Pick a theme, add your class days and times, then download your timetable.</p>
     </div>
+    <nav class="nav" aria-label="Tools">
+      <a href="index.html" aria-current="page">Timetable</a>
+      <a href="messages.html">Messages</a>
+    </nav>
   </header>
 
   <div class="grid">
@@ -196,9 +203,9 @@
 </div>
 
 <canvas id="canvas" hidden></canvas>
-<script src="assets-data.js?v=6"></script>
-<script src="themes.js?v=6"></script>
-<script src="render.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="assets-data.js?v=7"></script>
+<script src="themes.js?v=7"></script>
+<script src="render.js?v=7"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

@@ -12,6 +12,10 @@ A one-page website where a Baby Sensory franchisee picks a theme, types in their
 
 Their details stay saved in their own browser, so next term they only change what is different. Nothing is sent anywhere and there are no accounts.
 
+## Message templates
+
+`messages.html` (the **Messages** tab) gives franchisees ready-worded messages for parents: welcome, class reminder, class cancelled, spaces available, a space from the waiting list, rebooking, we missed you, and an end of term thank you. Each one is filled in from the classes and venue on the timetable page plus the franchisee's own name, area, phone and booking link. **Send in WhatsApp** opens WhatsApp (or WhatsApp Business) with the message typed out; nothing is sent until they press send. The wording is in the `TEMPLATES` list in `messages.js`.
+
 ## Putting it online for free (GitHub Pages)
 
 1. Sign in at github.com (a free account is fine) and create a new **public** repository, for example `timetable-maker`.
