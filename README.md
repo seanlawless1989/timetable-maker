@@ -16,6 +16,10 @@ Their details stay saved in their own browser, so next term they only change wha
 
 `messages.html` (the **Messages** tab) gives franchisees ready-worded messages for parents: welcome, class reminder, class cancelled, spaces available, a space from the waiting list, rebooking, we missed you, and an end of term thank you. Each one is filled in from the classes and venue on the timetable page plus the franchisee's own name, area, phone and booking link. **Send in WhatsApp** opens WhatsApp (or WhatsApp Business) with the message typed out; nothing is sent until they press send. The wording is in the `TEMPLATES` list in `messages.js`.
 
+## Gift vouchers
+
+`voucher.html` (the **Gift vouchers** tab) makes a branded gift voucher from a fixed template based on the Darlington voucher: an amount (for example £50) or something else (for example one term of classes), optional To and From names, a voucher number that goes up by one after each download or print, an optional expiry date, who to contact to redeem it, and editable terms. It downloads as a picture or prints on A4 landscape. The drawing is in `voucher.js`.
+
 ## Putting it online for free (GitHub Pages)
 
 1. Sign in at github.com (a free account is fine) and create a new **public** repository, for example `timetable-maker`.

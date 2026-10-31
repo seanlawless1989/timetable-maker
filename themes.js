@@ -427,7 +427,7 @@ const ELEMENTS = [
   ['girl', 'Girl saying hello'], ['boy', 'Boy waving'], ['friends-2', 'Friend'], ['friends-3', 'Friend 2'],
   ['friends-6', 'Three friends'], ['friends-4', 'Four friends'],
   ['note-2', 'Music note'], ['note-3', 'Music note 2'], ['note-4', 'Music note 3'], ['note-5', 'Music notes'], ['note-6', 'Music notes 2'],
-  ['ribbons-4', 'Ribbons'], ['ribbons-6', 'Ribbons 2'], ['ribbons-8', 'Ribbons 3'],
+  ['ribbons-4', 'Ribbons'], ['ribbons-6', 'Ribbons 2'], ['ribbons-8', 'Ribbons 3'], ['say-hello', 'Say hello'],
 ].map(([id, label]) => ({ id, label, src: (typeof ASSET_DATA !== 'undefined' && ASSET_DATA.elements[id]) || `assets/elements/${id}.png` }));
 
 /* ---------- Themes ----------
