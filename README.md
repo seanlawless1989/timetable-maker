@@ -20,6 +20,10 @@ Their details stay saved in their own browser, so next term they only change wha
 
 `voucher.html` (the **Gift vouchers** tab) makes a branded gift voucher from a fixed template based on the Darlington voucher: an amount (for example £50) or something else (for example one term of classes), optional To and From names, a voucher number that goes up by one after each download or print, an optional expiry date, who to contact to redeem it, and editable terms. It downloads as a picture or prints on A4 landscape. The drawing is in `voucher.js`.
 
+## Party posters
+
+`party.html` (the **Party posters** tab) makes an A4 party poster from a fixed template based on the Darlington parties poster: up to four packages with prices and what's included, the main heading, availability, booking contact, an optional photo in the circle (otherwise a brand picture), the "Now taking bookings" circle and the award badge. The drawing is in `party.js`.
+
 ## Putting it online for free (GitHub Pages)
 
 1. Sign in at github.com (a free account is fine) and create a new **public** repository, for example `timetable-maker`.
